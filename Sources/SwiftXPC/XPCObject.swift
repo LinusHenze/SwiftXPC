@@ -163,10 +163,11 @@ extension Optional: XPCObject where Wrapped == XPCObject {
     }
 }
 
-public class XPCError: XPCObject, XPCDictOrError, XPCDictConnectionOrError {
+public class XPCError: XPCObject, Error, CustomStringConvertible, CustomDebugStringConvertible, XPCDictOrError, XPCDictConnectionOrError {
     let underlying: xpc_object_t
     
-    public var description: String { String(cString: xpc_dictionary_get_string(underlying, XPC_ERROR_KEY_DESCRIPTION)!) }
+    public var description: String { "XPCError: " + String(cString: xpc_dictionary_get_string(underlying, XPC_ERROR_KEY_DESCRIPTION)!) }
+    public var debugDescription: String { description }
     
     fileprivate init(_ underlying: xpc_object_t) {
         assert(xpc_get_type(underlying) == XPC_TYPE_ERROR)
@@ -179,7 +180,7 @@ public class XPCError: XPCObject, XPCDictOrError, XPCDictConnectionOrError {
     }
 }
 
-public func xpc_object_t_to_XPCObject(_ obj: xpc_object_t) -> XPCObject? {
+func xpc_object_t_to_XPCObject(_ obj: xpc_object_t) -> XPCObject? {
     let type = xpc_get_type(obj)
     switch type {
     case XPC_TYPE_DICTIONARY:

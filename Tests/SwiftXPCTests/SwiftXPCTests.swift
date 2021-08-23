@@ -2,10 +2,7 @@ import XCTest
 @testable import SwiftXPC
 
 final class SwiftXPCTests: XCTestCase {
-    func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct
-        // results.
+    func testListener() {
         let request = [
             "Bool": false,
             "String": "Test",
@@ -43,10 +40,16 @@ final class SwiftXPCTests: XCTestCase {
         }
         client.activate()
         
-        print("Client: \(client.sendMessageWithReplySync(request))")
+        XCTAssertNoThrow(try {
+            let reply = try client.sendMessageWithReplySync(request)
+            
+            print("Client: \(reply)")
+            
+            XCTAssert(reply["status"] as? Int64 == 0)
+        }())
     }
 
     static var allTests = [
-        ("testExample", testExample),
+        ("testListener", testListener),
     ]
 }

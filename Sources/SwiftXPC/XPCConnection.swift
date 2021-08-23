@@ -86,12 +86,19 @@ public class XPCConnection: XPCObject, XPCDictConnectionOrError {
         }
     }
     
-    public func sendMessageWithReplySync(_ message: XPCDict) -> XPCDictOrError {
+    public func sendMessageWithReplySync(_ message: XPCDict) throws -> XPCDict {
         let res = xpc_connection_send_message_with_reply_sync(conn, message._toXPCObject())
         let xpcObj = xpc_object_t_to_XPCObject(res)
         
-        assert((xpcObj as? XPCDictOrError) != nil)
-        return xpcObj as! XPCDictOrError
+        if let error = xpcObj as? XPCError {
+            throw error
+        }
+        
+        guard let dict = xpcObj as? XPCDict else {
+            fatalError()
+        }
+        
+        return dict
     }
     
     public func _toXPCObject() -> xpc_object_t {
