@@ -3,13 +3,13 @@ import XPC
 import SwiftXPCCBindings
 
 // Ugly definitions below...
-let XPC_TYPE_MACH_SEND: xpc_type_t = unsafeBitCast(OpaquePointer(dlsym(dlopen(nil, 0), "NSClassFromString")), to: (@convention(c) (NSString) -> xpc_type_t?).self)("OS_xpc_mach_send")!
-let XPC_TYPE_MACH_RECV: xpc_type_t = unsafeBitCast(OpaquePointer(dlsym(dlopen(nil, 0), "NSClassFromString")), to: (@convention(c) (NSString) -> xpc_type_t?).self)("OS_xpc_mach_recv")!
+public let XPC_TYPE_MACH_SEND: xpc_type_t = unsafeBitCast(OpaquePointer(dlsym(dlopen(nil, 0), "NSClassFromString")), to: (@convention(c) (NSString) -> xpc_type_t?).self)("OS_xpc_mach_send")!
+public let XPC_TYPE_MACH_RECV: xpc_type_t = unsafeBitCast(OpaquePointer(dlsym(dlopen(nil, 0), "NSClassFromString")), to: (@convention(c) (NSString) -> xpc_type_t?).self)("OS_xpc_mach_recv")!
 
 // Potentially unavailable?
-let XPC_TYPE_MACH_SEND_ONCE: xpc_type_t? = unsafeBitCast(OpaquePointer(dlsym(dlopen(nil, 0), "NSClassFromString")), to: (@convention(c) (NSString) -> xpc_type_t?)?.self)?("OS_xpc_mach_send_once")!
+public let XPC_TYPE_MACH_SEND_ONCE: xpc_type_t? = unsafeBitCast(OpaquePointer(dlsym(dlopen(nil, 0), "NSClassFromString")), to: (@convention(c) (NSString) -> xpc_type_t?)?.self)?("OS_xpc_mach_send_once")!
 
-class XPCMachPortSendRight: XPCObject {
+public class XPCMachPortSendRight: XPCObject {
     let underlying: xpc_object_t
     
     init(_ underlying: xpc_object_t) {
@@ -18,28 +18,28 @@ class XPCMachPortSendRight: XPCObject {
         self.underlying = underlying
     }
     
-    convenience init(consuming sr: mach_port_t) {
+    public convenience init(consuming sr: mach_port_t) {
         self.init(xpc_mach_send_create_with_disposition(sr, MACH_MSG_TYPE_MOVE_SEND))
     }
     
-    convenience init(copying sr: mach_port_t) {
+    public convenience init(copying sr: mach_port_t) {
         self.init(xpc_mach_send_create_with_disposition(sr, MACH_MSG_TYPE_COPY_SEND))
     }
     
-    convenience init(fromReceiveRight rr: mach_port_t) {
+    public convenience init(fromReceiveRight rr: mach_port_t) {
         self.init(xpc_mach_send_create_with_disposition(rr, MACH_MSG_TYPE_MAKE_SEND))
     }
     
-    func copySendRight() -> mach_port_t {
+    public func copySendRight() -> mach_port_t {
         xpc_mach_send_copy_right(underlying)
     }
     
-    func _toXPCObject() -> xpc_object_t {
+    public func _toXPCObject() -> xpc_object_t {
         underlying
     }
 }
 
-class XPCMachPortReceiveRight: XPCObject {
+public class XPCMachPortReceiveRight: XPCObject {
     let underlying: xpc_object_t
     
     init(_ underlying: xpc_object_t) {
@@ -48,20 +48,20 @@ class XPCMachPortReceiveRight: XPCObject {
         self.underlying = underlying
     }
     
-    convenience init(consuming rr: mach_port_t) {
+    public convenience init(consuming rr: mach_port_t) {
         self.init(xpc_mach_recv_create(rr))
     }
     
-    func extractReceiveRight() -> mach_port_t {
+    public func extractReceiveRight() -> mach_port_t {
         xpc_mach_recv_extract_right(underlying)
     }
     
-    func _toXPCObject() -> xpc_object_t {
+    public func _toXPCObject() -> xpc_object_t {
         underlying
     }
 }
 
-class XPCMachPortSendOnceRight: XPCObject {
+public class XPCMachPortSendOnceRight: XPCObject {
     let underlying: xpc_object_t
     
     init(_ underlying: xpc_object_t) {
@@ -74,7 +74,7 @@ class XPCMachPortSendOnceRight: XPCObject {
         self.underlying = underlying
     }
     
-    convenience init(consuming sor: mach_port_t) {
+    public convenience init(consuming sor: mach_port_t) {
         guard XPC_TYPE_MACH_SEND_ONCE != nil else {
             fatalError("XPC send once rights are not available!")
         }
@@ -89,7 +89,7 @@ class XPCMachPortSendOnceRight: XPCObject {
         self.init(xpc_mach_send_once_create(sor))
     }
     
-    func extractSendOnceRight() -> mach_port_t {
+    public func extractSendOnceRight() -> mach_port_t {
         guard XPC_TYPE_MACH_SEND_ONCE != nil else {
             fatalError("XPC send once rights are not available!")
         }
@@ -104,7 +104,7 @@ class XPCMachPortSendOnceRight: XPCObject {
         return xpc_mach_send_once_extract_right(underlying)
     }
     
-    func _toXPCObject() -> xpc_object_t {
+    public func _toXPCObject() -> xpc_object_t {
         underlying
     }
 }
