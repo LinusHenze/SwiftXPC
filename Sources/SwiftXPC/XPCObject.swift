@@ -5,10 +5,13 @@ public protocol XPCObject {
     func _toXPCObject() -> xpc_object_t
 }
 
+public protocol XPCDictOrError: XPCObject {}
+public protocol XPCDictConnectionOrError: XPCObject {}
+
 public typealias XPCSwiftDict = [String: XPCObject?]
 public typealias XPCArray     = [XPCObject?]
 
-public class XPCDict: ExpressibleByDictionaryLiteral, Sequence, CustomStringConvertible, CustomDebugStringConvertible, CustomReflectable, XPCObject {
+public class XPCDict: ExpressibleByDictionaryLiteral, Sequence, CustomStringConvertible, CustomDebugStringConvertible, CustomReflectable, XPCObject, XPCDictOrError, XPCDictConnectionOrError {
     public typealias Key = String
     public typealias Value = XPCObject?
     
@@ -160,7 +163,7 @@ extension Optional: XPCObject where Wrapped == XPCObject {
     }
 }
 
-public class XPCError: XPCObject {
+public class XPCError: XPCObject, XPCDictOrError, XPCDictConnectionOrError {
     let underlying: xpc_object_t
     
     public var description: String { String(cString: xpc_dictionary_get_string(underlying, XPC_ERROR_KEY_DESCRIPTION)!) }
@@ -232,8 +235,19 @@ public func xpc_object_t_to_XPCObject(_ obj: xpc_object_t) -> XPCObject? {
     case XPC_TYPE_CONNECTION:
         return XPCConnection(connection: obj)
         
+    case XPC_TYPE_MACH_SEND:
+        return XPCMachPortSendRight(obj)
+        
+    case XPC_TYPE_MACH_RECV:
+        return XPCMachPortReceiveRight(obj)
+        
     default:
-        if #available(OSX 10.15, *) {
+        if XPC_TYPE_MACH_SEND_ONCE != nil,
+           type == XPC_TYPE_MACH_SEND_ONCE.unsafelyUnwrapped {
+            return XPCMachPortSendOnceRight(obj)
+        }
+        
+        if #available(macOS 10.15, *) {
             let str = String(cString: xpc_type_get_name(type))
             fatalError("Don't know how to handle XPC type \(str)")
         } else {

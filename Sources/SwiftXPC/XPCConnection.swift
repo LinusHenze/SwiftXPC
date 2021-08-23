@@ -1,7 +1,7 @@
 import Foundation
 import XPC
 
-public class XPCConnection: XPCObject {
+public class XPCConnection: XPCObject, XPCDictConnectionOrError {
     public enum MachServiceFlags {
         case none
         case listener
@@ -60,25 +60,38 @@ public class XPCConnection: XPCObject {
         xpc_connection_suspend(conn)
     }
     
-    public func setEventHandler(_ handler: @escaping (XPCObject?) -> Void) {
-        xpc_connection_set_event_handler(conn) { (obj) in
-            handler(xpc_object_t_to_XPCObject(obj))
+    public func cancel() {
+        xpc_connection_cancel(conn)
+    }
+    
+    public func setEventHandler(_ handler: @escaping (XPCDictConnectionOrError) -> Void) {
+        xpc_connection_set_event_handler(conn) {
+            let xpcObj = xpc_object_t_to_XPCObject($0)
+            
+            assert((xpcObj as? XPCDictConnectionOrError) != nil)
+            handler(xpcObj as! XPCDictConnectionOrError)
         }
     }
     
-    public func sendMessage(_ message: XPCObject) {
+    public func sendMessage(_ message: XPCDict) {
         xpc_connection_send_message(conn, message._toXPCObject())
     }
     
-    public func sendMessageWithReply(_ message: XPCObject, _ handler: @escaping (XPCObject?) -> Void, replyQueue: DispatchQueue? = nil) {
+    public func sendMessageWithReply(_ message: XPCDict, _ handler: @escaping (XPCDictOrError) -> Void, replyQueue: DispatchQueue? = nil) {
         xpc_connection_send_message_with_reply(conn, message._toXPCObject(), replyQueue) {
-            handler(xpc_object_t_to_XPCObject($0))
+            let xpcObj = xpc_object_t_to_XPCObject($0)
+            
+            assert((xpcObj as? XPCDictOrError) != nil)
+            handler(xpcObj as! XPCDictOrError)
         }
     }
     
-    public func sendMessageWithReplySync(_ message: XPCObject) -> XPCObject? {
+    public func sendMessageWithReplySync(_ message: XPCDict) -> XPCDictOrError {
         let res = xpc_connection_send_message_with_reply_sync(conn, message._toXPCObject())
-        return xpc_object_t_to_XPCObject(res)
+        let xpcObj = xpc_object_t_to_XPCObject(res)
+        
+        assert((xpcObj as? XPCDictOrError) != nil)
+        return xpcObj as! XPCDictOrError
     }
     
     public func _toXPCObject() -> xpc_object_t {

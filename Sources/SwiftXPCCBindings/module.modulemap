@@ -1,0 +1,3 @@
+module SwiftXPCCBindings [system] {
+    header "SwiftXPCCBindings.h"
+}

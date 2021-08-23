@@ -32,18 +32,18 @@ final class SwiftXPCTests: XCTestCase {
                 
                 conn.activate()
             } else {
-                print("Listener: \(obj ?? "<nil>")")
+                print("Listener: \(obj)")
             }
         }
         listener.activate()
         
         let client = XPCConnection(machService: "de.linushenze.test")
         client.setEventHandler { (obj) in
-            print("Client: \(obj ?? "<nil>")")
+            print("Client: \(obj)")
         }
         client.activate()
         
-        print("Client: \(client.sendMessageWithReplySync(request)!)")
+        print("Client: \(client.sendMessageWithReplySync(request))")
     }
 
     static var allTests = [
