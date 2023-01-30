@@ -1,3 +1,11 @@
+//
+//  XPCConnection.swift
+//  SwiftXPC
+//
+//  Created by Linus Henze.
+//  Copyright © 2021 Pinauten GmbH. All rights reserved.
+//
+
 import Foundation
 import XPC
 
