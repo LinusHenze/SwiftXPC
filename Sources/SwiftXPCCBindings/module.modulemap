@@ -1,3 +1,4 @@
 module SwiftXPCCBindings [system] {
     header "SwiftXPCCBindings.h"
+    header "XPCOverlayShims.h"
 }

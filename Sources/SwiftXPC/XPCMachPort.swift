@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import XPC
 import SwiftXPCCBindings
 
 // Ugly definitions below...

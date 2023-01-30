@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import XPC
+import SwiftXPCCBindings
 
 public protocol XPCObject {
     func _toXPCObject() -> xpc_object_t
@@ -256,7 +256,7 @@ func xpc_object_t_to_XPCObject(_ obj: xpc_object_t) -> XPCObject? {
             return XPCMachPortSendOnceRight(obj)
         }
         
-        if #available(macOS 10.15, *) {
+        if #available(macOS 10.15, iOS 13.0, *) {
             let str = String(cString: xpc_type_get_name(type))
             fatalError("Don't know how to handle XPC type \(str)")
         } else {

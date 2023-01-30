@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import XPC
+import SwiftXPCCBindings
 
 public class XPCConnection: XPCObject, XPCDictConnectionOrError {
     public enum MachServiceFlags {
