@@ -12,6 +12,8 @@
 #include <xpc/xpc.h>
 #include <mach/mach.h>
 
+#include "XPCOverlayShims.h"
+
 typedef xpc_object_t xpc_pipe_t;
 
 // Mach send rights
