@@ -13,6 +13,12 @@ public protocol XPCObject {
     func toXPCObject() -> xpc_object_t
 }
 
+public extension XPCObject {
+    func toOpaqueXPCObject() -> UnsafeMutableRawPointer {
+        Unmanaged.passUnretained(toXPCObject()).toOpaque()
+    }
+}
+
 public protocol XPCDictOrError: XPCObject {}
 public protocol XPCDictConnectionOrError: XPCObject {}
 
