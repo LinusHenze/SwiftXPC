@@ -82,11 +82,11 @@ public class XPCConnection: XPCObject, XPCDictConnectionOrError {
     }
     
     public func sendMessage(_ message: XPCDict) {
-        xpc_connection_send_message(conn, message._toXPCObject())
+        xpc_connection_send_message(conn, message.toXPCObject())
     }
     
     public func sendMessageWithReply(_ message: XPCDict, _ handler: @escaping (XPCDictOrError) -> Void, replyQueue: DispatchQueue? = nil) {
-        xpc_connection_send_message_with_reply(conn, message._toXPCObject(), replyQueue) {
+        xpc_connection_send_message_with_reply(conn, message.toXPCObject(), replyQueue) {
             let xpcObj = xpc_object_t_to_XPCObject($0)
             
             assert((xpcObj as? XPCDictOrError) != nil)
@@ -95,7 +95,7 @@ public class XPCConnection: XPCObject, XPCDictConnectionOrError {
     }
     
     public func sendMessageWithReplySync(_ message: XPCDict) throws -> XPCDict {
-        let res = xpc_connection_send_message_with_reply_sync(conn, message._toXPCObject())
+        let res = xpc_connection_send_message_with_reply_sync(conn, message.toXPCObject())
         let xpcObj = xpc_object_t_to_XPCObject(res)
         
         if let error = xpcObj as? XPCError {
@@ -109,7 +109,7 @@ public class XPCConnection: XPCObject, XPCDictConnectionOrError {
         return dict
     }
     
-    public func _toXPCObject() -> xpc_object_t {
+    public func toXPCObject() -> xpc_object_t {
         return conn
     }
 }

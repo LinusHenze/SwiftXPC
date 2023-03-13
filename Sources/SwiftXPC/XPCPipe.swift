@@ -22,7 +22,7 @@ public class XPCPipe {
     
     public func send(message: XPCDict) -> XPCDictOrError? {
         var obj: xpc_object_t?
-        let kr = xpc_pipe_routine(pipe, message._toXPCObject(), &obj)
+        let kr = xpc_pipe_routine(pipe, message.toXPCObject(), &obj)
         guard kr == KERN_SUCCESS,
               let obj = obj else {
             // XXX: Throw error
@@ -34,11 +34,11 @@ public class XPCPipe {
     }
     
     public func sendOneway(message: XPCDict) -> Bool {
-        xpc_pipe_simpleroutine(pipe, message._toXPCObject()) == KERN_SUCCESS
+        xpc_pipe_simpleroutine(pipe, message.toXPCObject()) == KERN_SUCCESS
     }
     
     public func forward(message: XPCDict) -> Bool {
-        xpc_pipe_routine_forward(pipe, message._toXPCObject()) == KERN_SUCCESS
+        xpc_pipe_routine_forward(pipe, message.toXPCObject()) == KERN_SUCCESS
     }
     
     public static func receive(port: mach_port_t) -> XPCDictOrError? {
@@ -54,6 +54,6 @@ public class XPCPipe {
     }
     
     public static func reply(dict: XPCDict) {
-        xpc_pipe_routine_reply(dict._toXPCObject())
+        xpc_pipe_routine_reply(dict.toXPCObject())
     }
 }

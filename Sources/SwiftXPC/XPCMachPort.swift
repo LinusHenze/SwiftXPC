@@ -41,7 +41,7 @@ public class XPCMachPortSendRight: XPCObject {
         xpc_mach_send_copy_right(underlying)
     }
     
-    public func _toXPCObject() -> xpc_object_t {
+    public func toXPCObject() -> xpc_object_t {
         underlying
     }
 }
@@ -63,7 +63,7 @@ public class XPCMachPortReceiveRight: XPCObject {
         xpc_mach_recv_extract_right(underlying)
     }
     
-    public func _toXPCObject() -> xpc_object_t {
+    public func toXPCObject() -> xpc_object_t {
         underlying
     }
 }
@@ -111,7 +111,7 @@ public class XPCMachPortSendOnceRight: XPCObject {
         return xpc_mach_send_once_extract_right(underlying)
     }
     
-    public func _toXPCObject() -> xpc_object_t {
+    public func toXPCObject() -> xpc_object_t {
         underlying
     }
 }

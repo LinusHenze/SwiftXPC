@@ -10,7 +10,7 @@ import Foundation
 import SwiftXPCCBindings
 
 public protocol XPCObject {
-    func _toXPCObject() -> xpc_object_t
+    func toXPCObject() -> xpc_object_t
 }
 
 public protocol XPCDictOrError: XPCObject {}
@@ -38,14 +38,14 @@ public class XPCDict: ExpressibleByDictionaryLiteral, Sequence, CustomStringConv
     public init(fromSwiftDict sDict: XPCSwiftDict) {
         xpcDict = xpc_dictionary_create(nil, nil, 0)
         for elem in sDict {
-            xpc_dictionary_set_value(xpcDict, elem.key.cString(using: .utf8)!, elem.value._toXPCObject())
+            xpc_dictionary_set_value(xpcDict, elem.key.cString(using: .utf8)!, elem.value.toXPCObject())
         }
     }
     
     public required init(dictionaryLiteral elements: (Key, Value)...) {
         xpcDict = xpc_dictionary_create(nil, nil, 0)
         for elem in elements {
-            xpc_dictionary_set_value(xpcDict, elem.0.cString(using: .utf8)!, elem.1._toXPCObject())
+            xpc_dictionary_set_value(xpcDict, elem.0.cString(using: .utf8)!, elem.1.toXPCObject())
         }
     }
     
@@ -59,7 +59,7 @@ public class XPCDict: ExpressibleByDictionaryLiteral, Sequence, CustomStringConv
         }
         
         set {
-            xpc_dictionary_set_value(xpcDict, key.cString(using: .utf8)!, newValue?._toXPCObject())
+            xpc_dictionary_set_value(xpcDict, key.cString(using: .utf8)!, newValue?.toXPCObject())
         }
     }
     
@@ -87,16 +87,16 @@ public class XPCDict: ExpressibleByDictionaryLiteral, Sequence, CustomStringConv
         return toSwiftDict().makeIterator()
     }
     
-    public func _toXPCObject() -> xpc_object_t {
+    public func toXPCObject() -> xpc_object_t {
         xpcDict
     }
 }
 
 extension XPCArray: XPCObject {
-    public func _toXPCObject() -> xpc_object_t {
+    public func toXPCObject() -> xpc_object_t {
         let xpcAr = xpc_array_create(nil, 0)
         for elem in self {
-            xpc_array_append_value(xpcAr, elem._toXPCObject())
+            xpc_array_append_value(xpcAr, elem.toXPCObject())
         }
         
         return xpcAr
@@ -104,7 +104,7 @@ extension XPCArray: XPCObject {
 }
 
 extension Data: XPCObject {
-    public func _toXPCObject() -> xpc_object_t {
+    public func toXPCObject() -> xpc_object_t {
         withUnsafeBytes {
             xpc_data_create($0.baseAddress, $0.count)
         }
@@ -112,49 +112,49 @@ extension Data: XPCObject {
 }
 
 extension String: XPCObject {
-    public func _toXPCObject() -> xpc_object_t {
+    public func toXPCObject() -> xpc_object_t {
         xpc_string_create(self.cString(using: .utf8)!)
     }
 }
 
 extension Bool: XPCObject {
-    public func _toXPCObject() -> xpc_object_t {
+    public func toXPCObject() -> xpc_object_t {
         xpc_bool_create(self)
     }
 }
 
 extension UInt64: XPCObject {
-    public func _toXPCObject() -> xpc_object_t {
+    public func toXPCObject() -> xpc_object_t {
         xpc_uint64_create(self)
     }
 }
 
 extension Int64: XPCObject {
-    public func _toXPCObject() -> xpc_object_t {
+    public func toXPCObject() -> xpc_object_t {
         xpc_int64_create(self)
     }
 }
 
 extension UInt: XPCObject {
-    public func _toXPCObject() -> xpc_object_t {
+    public func toXPCObject() -> xpc_object_t {
         xpc_uint64_create(UInt64(self))
     }
 }
 
 extension Int: XPCObject {
-    public func _toXPCObject() -> xpc_object_t {
+    public func toXPCObject() -> xpc_object_t {
         xpc_int64_create(Int64(self))
     }
 }
 
 extension Double: XPCObject {
-    public func _toXPCObject() -> xpc_object_t {
+    public func toXPCObject() -> xpc_object_t {
         xpc_double_create(self)
     }
 }
 
 extension UUID: XPCObject {
-    public func _toXPCObject() -> xpc_object_t {
+    public func toXPCObject() -> xpc_object_t {
         withUnsafePointer(to: uuid.0) {
             xpc_uuid_create($0)
         }
@@ -162,9 +162,9 @@ extension UUID: XPCObject {
 }
 
 extension Optional: XPCObject where Wrapped == XPCObject {
-    public func _toXPCObject() -> xpc_object_t {
+    public func toXPCObject() -> xpc_object_t {
         if self != nil {
-            return self.unsafelyUnwrapped._toXPCObject()
+            return self.unsafelyUnwrapped.toXPCObject()
         }
         
         return xpc_null_create()
@@ -183,7 +183,7 @@ public class XPCError: XPCObject, Error, CustomStringConvertible, CustomDebugStr
         self.underlying = underlying
     }
     
-    public func _toXPCObject() -> xpc_object_t {
+    public func toXPCObject() -> xpc_object_t {
         underlying
     }
 }
