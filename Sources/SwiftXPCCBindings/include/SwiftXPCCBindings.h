@@ -29,10 +29,10 @@ xpc_pipe_t xpc_pipe_create(const char *name, uint64_t flags);
 xpc_pipe_t xpc_pipe_create_from_port(mach_port_t port, uint64_t flags);
 
 // Receive (takes a port not pipe)
-int xpc_pipe_receive(mach_port_t port, xpc_object_t* message);
+int xpc_pipe_receive(mach_port_t port, __strong xpc_object_t* message);
 
 // Send
-int xpc_pipe_routine(xpc_pipe_t pipe, xpc_object_t request, xpc_object_t* reply);
+int xpc_pipe_routine(xpc_pipe_t pipe, xpc_object_t request, __strong xpc_object_t* reply);
 int xpc_pipe_routine_reply(xpc_object_t reply);
 int xpc_pipe_simpleroutine(xpc_pipe_t pipe, xpc_object_t message);
 
